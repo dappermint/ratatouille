@@ -175,7 +175,7 @@ func TestRealBundlesOnThisMachine(t *testing.T) {
 			}
 			path := filepath.Join(root, entry.Name(), "Contents", "Info.plist")
 			dict, err := ReadFile(path)
-			if os.IsNotExist(err) {
+			if os.IsNotExist(err) || os.IsPermission(err) {
 				continue
 			}
 			if err != nil {
