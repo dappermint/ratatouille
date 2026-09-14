@@ -39,9 +39,16 @@ func UniqueStrings(values []string) []string {
 	return result
 }
 
+// tailBytes is kept from the end of an oversized stream. Command summaries
+// ("N store paths would be deleted") are the last line, so head-only
+// truncation would drop exactly the part every caller parses.
+const tailBytes = 8 << 10
+
 type cappedBuffer struct {
-	buffer bytes.Buffer
-	limit  int
+	buffer   bytes.Buffer
+	tail     []byte
+	limit    int
+	overflow bool
 }
 
 type CommandIdentity struct {
@@ -56,16 +63,28 @@ func (b *cappedBuffer) Write(data []byte) (int, error) {
 	original := len(data)
 	remaining := b.limit - b.buffer.Len()
 	if remaining > 0 {
-		if len(data) > remaining {
-			data = data[:remaining]
+		head := data
+		if len(head) > remaining {
+			head = head[:remaining]
 		}
-		_, _ = b.buffer.Write(data)
+		_, _ = b.buffer.Write(head)
+		data = data[len(head):]
+	}
+	if len(data) > 0 {
+		b.overflow = true
+		b.tail = append(b.tail, data...)
+		if len(b.tail) > tailBytes {
+			b.tail = append(b.tail[:0], b.tail[len(b.tail)-tailBytes:]...)
+		}
 	}
 	return original, nil
 }
 
 func (b *cappedBuffer) String() string {
-	return b.buffer.String()
+	if !b.overflow {
+		return b.buffer.String()
+	}
+	return b.buffer.String() + "\n…truncated…\n" + string(b.tail)
 }
 
 func CaptureCommand(ctx context.Context, timeout time.Duration, command string, args ...string) (string, error) {
