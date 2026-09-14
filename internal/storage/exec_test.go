@@ -9,8 +9,8 @@ import (
 // one line callers parse. Head-only truncation silently dropped that summary.
 func TestCappedBufferKeepsTail(t *testing.T) {
 	buffer := &cappedBuffer{limit: 1024}
-	buffer.Write([]byte(strings.Repeat("/nix/store/dead\n", 4096)))
-	buffer.Write([]byte("32973 store paths would be deleted\n"))
+	_, _ = buffer.Write([]byte(strings.Repeat("/nix/store/dead\n", 4096)))
+	_, _ = buffer.Write([]byte("32973 store paths would be deleted\n"))
 
 	output := buffer.String()
 	if !strings.Contains(output, "32973 store paths would be deleted") {
