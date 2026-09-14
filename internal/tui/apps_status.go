@@ -173,13 +173,6 @@ func (state *tuiState) statusRows() []statusRow {
 	if snapshot.GPU != nil {
 		rows = append(rows, statusRow{name: "gpu", value: fmt.Sprintf("%.1f%%", snapshot.GPU.Device), detail: fmt.Sprintf("renderer %.1f%%, tiler %.1f%%", snapshot.GPU.Renderer, snapshot.GPU.Tiler), colour: pressureColour(int(snapshot.GPU.Device))})
 	}
-	if len(snapshot.CPU.PerCore) > 0 {
-		parts := make([]string, 0, len(snapshot.CPU.PerCore))
-		for _, core := range snapshot.CPU.PerCore {
-			parts = append(parts, fmt.Sprintf("%d:%.0f%%", core.ID, core.Busy))
-		}
-		rows = append(rows, statusRow{name: "cpu cores", value: fmt.Sprintf("%d", len(snapshot.CPU.PerCore)), detail: strings.Join(parts, " "), colour: colorCyan})
-	}
 	for _, disk := range snapshot.Disks {
 		rows = append(rows, statusRow{name: "disk " + disk.Device, value: fmt.Sprintf("%.1f MB/s", disk.Throughput), detail: fmt.Sprintf("%.1f transfers/s, %.1f KB/transfer", disk.Transfers, disk.KBPerAccess), colour: colorCyan})
 	}

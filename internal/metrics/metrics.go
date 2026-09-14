@@ -53,18 +53,12 @@ type Hardware struct {
 }
 
 type CPU struct {
-	User    float64    `json:"user_percent"`
-	System  float64    `json:"system_percent"`
-	Idle    float64    `json:"idle_percent"`
-	Busy    float64    `json:"busy_percent"`
-	Load    [3]float64 `json:"load_average"`
-	Cores   int        `json:"cores"`
-	PerCore []Core     `json:"per_core,omitempty"`
-}
-
-type Core struct {
-	ID   int     `json:"id"`
-	Busy float64 `json:"busy_percent"`
+	User   float64    `json:"user_percent"`
+	System float64    `json:"system_percent"`
+	Idle   float64    `json:"idle_percent"`
+	Busy   float64    `json:"busy_percent"`
+	Load   [3]float64 `json:"load_average"`
+	Cores  int        `json:"cores"`
 }
 
 // Memory reports two numbers that are not complements of each other, because
@@ -212,16 +206,6 @@ func Collect(ctx context.Context) Snapshot {
 		snapshot.CPU.User, snapshot.CPU.System, snapshot.CPU.Idle = cpu.User, cpu.System, cpu.Idle
 		snapshot.CPU.Busy, snapshot.CPU.Load = cpu.Busy, cpu.Load
 		snapshot.Disks = disks
-		mutex.Unlock()
-		note(issue)
-	}()
-
-	waiter.Add(1)
-	go func() {
-		defer waiter.Done()
-		cores, issue := readPerCore(ctx)
-		mutex.Lock()
-		snapshot.CPU.PerCore = cores
 		mutex.Unlock()
 		note(issue)
 	}()

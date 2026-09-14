@@ -258,16 +258,6 @@ func TestLevelBands(t *testing.T) {
 	}
 }
 
-func TestPerCoreDelta(t *testing.T) {
-	cores := parseCoreTimes("10 0 10 80 0  20 0 20 60 0", "20 0 20 160 0  60 0 40 100 0")
-	if len(cores) != 2 {
-		t.Fatalf("cores = %+v", cores)
-	}
-	if math.Abs(cores[0].Busy-20) > 0.01 || math.Abs(cores[1].Busy-60) > 0.01 {
-		t.Fatalf("core deltas = %+v", cores)
-	}
-}
-
 func TestIORegMetricsAllowAppleSpacing(t *testing.T) {
 	matches := ioregMetric.FindAllStringSubmatch(`"Device Utilization %" = 48,"Renderer Utilization %"=31`, -1)
 	if len(matches) != 2 || matches[0][2] != "48" || matches[1][2] != "31" {

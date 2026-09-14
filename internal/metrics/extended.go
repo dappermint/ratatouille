@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"regexp"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -14,58 +13,6 @@ import (
 )
 
 var ioregMetric = regexp.MustCompile(`"([^"]+)"\s*=\s*([0-9]+)`) // ioreg's text dictionary form
-
-func readPerCore(ctx context.Context) ([]Core, string) {
-	first, err := storage.CaptureCommand(ctx, quickTimeout, "/usr/sbin/sysctl", "-n", "kern.cp_times")
-	if err != nil {
-		return nil, "per-core cpu: " + storage.CompactError(err)
-	}
-	select {
-	case <-time.After(sampleWindow):
-	case <-ctx.Done():
-		return nil, ""
-	}
-	second, err := storage.CaptureCommand(ctx, quickTimeout, "/usr/sbin/sysctl", "-n", "kern.cp_times")
-	if err != nil {
-		return nil, "per-core cpu: " + storage.CompactError(err)
-	}
-	return parseCoreTimes(first, second), ""
-}
-
-func parseCoreTimes(first, second string) []Core {
-	before, after := integerFields(first), integerFields(second)
-	count := min(len(before), len(after)) / 5
-	cores := make([]Core, 0, count)
-	for core := 0; core < count; core++ {
-		base := core * 5
-		var total uint64
-		for index := 0; index < 5; index++ {
-			if after[base+index] >= before[base+index] {
-				total += after[base+index] - before[base+index]
-			}
-		}
-		idle := uint64(0)
-		if after[base+3] >= before[base+3] {
-			idle = after[base+3] - before[base+3]
-		}
-		busy := float64(0)
-		if total > 0 {
-			busy = float64(total-idle) / float64(total) * 100
-		}
-		cores = append(cores, Core{ID: core, Busy: busy})
-	}
-	return cores
-}
-
-func integerFields(value string) []uint64 {
-	var result []uint64
-	for _, field := range strings.Fields(value) {
-		if parsed, err := strconv.ParseUint(field, 10, 64); err == nil {
-			result = append(result, parsed)
-		}
-	}
-	return result
-}
 
 func enrichPower(ctx context.Context, power *Power) {
 	output, err := storage.CaptureCommand(ctx, quickTimeout, "/usr/sbin/ioreg", "-r", "-c", "AppleSmartBattery", "-a")

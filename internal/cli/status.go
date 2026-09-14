@@ -105,13 +105,6 @@ func printStatus(out io.Writer, snapshot metrics.Snapshot, explain bool) {
 		"cpu", meter(snapshot.CPU.Busy), snapshot.CPU.Busy, snapshot.CPU.User, snapshot.CPU.System)
 	fmt.Fprintf(out, "%-9s load %.2f / %.2f / %.2f over %d cores\n",
 		"", snapshot.CPU.Load[0], snapshot.CPU.Load[1], snapshot.CPU.Load[2], snapshot.CPU.Cores)
-	if len(snapshot.CPU.PerCore) > 0 {
-		parts := make([]string, 0, len(snapshot.CPU.PerCore))
-		for _, core := range snapshot.CPU.PerCore {
-			parts = append(parts, fmt.Sprintf("%d:%.0f%%", core.ID, core.Busy))
-		}
-		fmt.Fprintf(out, "%-9s cores %s\n", "", strings.Join(parts, " "))
-	}
 	if snapshot.GPU != nil {
 		fmt.Fprintf(out, "%-9s %s  %5.1f%% device   %.1f renderer  %.1f tiler\n",
 			"gpu", meter(snapshot.GPU.Device), snapshot.GPU.Device, snapshot.GPU.Renderer, snapshot.GPU.Tiler)
