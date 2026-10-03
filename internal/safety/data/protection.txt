@@ -193,6 +193,7 @@ com.apple.campo
 com.apple.chrono.WidgetRenderer-Activities
 com.apple.clock
 com.apple.controlcenter
+com.apple.controlcenter.PreloginSystemBannerRenderer
 com.apple.controlstrip
 com.apple.coreservices.uiagent
 com.apple.databaseevents
