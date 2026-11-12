@@ -103,6 +103,7 @@ com.apple.Home
 com.apple.IOUIAgent
 com.apple.IPAInstaller
 com.apple.Image_Capture
+com.apple.InCallService
 com.apple.Installer-Progress
 com.apple.JavaLauncher
 com.apple.KeyboardAccessAgent
@@ -152,6 +153,7 @@ com.apple.ScreenTimeWidgetApplication
 com.apple.ScriptEditor2
 com.apple.ScriptMenuApp
 com.apple.ScriptMonitor
+com.apple.ServicesPaymentAngel
 com.apple.Settings
 com.apple.SetupAssistant
 com.apple.Sharing.AirDropUI
@@ -181,6 +183,7 @@ com.apple.WatchFaceAlert
 com.apple.WindowManager
 com.apple.WorkoutAlert-Mac
 com.apple.accessibility.AccessibilityReader
+com.apple.airplay.receiver
 com.apple.airport.airportutility
 com.apple.appleseed.FeedbackAssistant
 com.apple.apps.launcher
